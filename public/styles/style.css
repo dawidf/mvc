@@ -1,0 +1,17 @@
+.error
+{
+    background: #ff3900;
+    color: azure;
+    display: block;
+    padding: 20px;
+    font-weight: bold;
+}
+.success
+{
+    background: #00ff02;
+    display: block;
+    color: azure;
+    padding: 20px;
+    font-weight: bold;
+    
+}

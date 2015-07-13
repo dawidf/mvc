@@ -1,13 +1,19 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+session_start();
+$stopWatching = isset( $stopWatching )  ? $stopWatching : false;
 try
 {
     //Dodanie sciezek plikow
     set_include_path
     (
         get_include_path() . PATH_SEPARATOR . getcwd() . '/../lib/' . DIRECTORY_SEPARATOR .
-        get_include_path() . PATH_SEPARATOR . getcwd() . '/../application/config/'. PATH_SEPARATOR
+        get_include_path() . PATH_SEPARATOR . getcwd() . '/../application/config/'. PATH_SEPARATOR .
+        get_include_path() . PATH_SEPARATOR . getcwd() . '/../application/controllers/' . PATH_SEPARATOR .
+        get_include_path() . PATH_SEPARATOR . getcwd() . '/../application/views/' . PATH_SEPARATOR .
+        get_include_path() . PATH_SEPARATOR . getcwd() . '/../application/models/' . PATH_SEPARATOR .
+        get_include_path() . PATH_SEPARATOR . getcwd() . '/../lib/wideimage/' .PATH_SEPARATOR
     );
     //ladowanie powyzszych sciezek
     function MVCAutoload( $className )
@@ -22,18 +28,58 @@ try
     $controller = $request->getParam( 'controller', 'index' );
 
 
-    echo $controller;
+
 
     //konfiguracja w singletonie
     $config = Config::getInstance();
     $config = $config->getConfig();
-    echo '<pre>';
-    print_r($config);
+
 
     //sprawdza czy kontroller istnieje;
     if( file_exists( $config['APP_DIR'] . 'controllers/' . $controller . 'Controller.php' ) )
     {
-        //cos tam dalej
+        //odbieranie kontrollera
+        $requestObject = $controller . 'Controller';
+        //pobranie parametru akcji
+        $action = $request->getParam( 'action', 'index' );
+        if( class_exists( $requestObject ) )
+        {
+
+            $actObject = new $requestObject();
+
+            $requestAction = $action .'Action';
+            //sprawdza czy metoda w klasie istnieje
+            if( method_exists( $requestObject, $requestAction ) )
+            {
+                ob_start();
+                $actObject->$requestAction();
+
+                $layout = $actObject->layout;
+
+                $content = ob_get_contents();
+                ob_end_clean();
+
+                if( isSet( $actObject->layoutName ) && $actObject->layoutName != '' )
+                {
+                    include_once( $actObject->layoutName . '.php' );
+                }
+                else
+                {
+                    include_once( $config['LAYOUT'] );
+                }
+
+
+            }
+            else
+            {
+                throw new Exception( 'Method ' . $requestAction . ' not exists in class: ' .$requestObject );
+            }
+        }
+        else
+        {
+            throw new Exception( 'Class ' . $controller . 'Controller not exists in file: ' .
+                $config['APP_DIR'] . 'controllers/' . $requestObject . '.php' );
+        }
     }
     else
     {

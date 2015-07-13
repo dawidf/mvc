@@ -24,13 +24,15 @@ final class Config {
             'LAYOUT' => getcwd() . '/../application/views/layouts/layout.php',
             'BASE_URL' => 'http://mvc.pl/',
             'IMG_DIR' => getcwd(). '/images/',
+            'PUBLIC_IMG' => 'http://mvc.pl/images/',
+            'PUBLIC_IMG_MIN' => 'http://mvc.pl/images/min/',
 
             /**
              * database config
              */
-            'DB_NAME' => 'katalog',
+            'DB_NAME' => 'samochody',
             'DB_USER' => 'root',
-            'DB_PASS' => '123qwe',
+            'DB_PASS' => 'root',
             'DB_HOST' => 'localhost'
         );
     }
